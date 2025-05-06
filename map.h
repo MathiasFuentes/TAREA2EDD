@@ -1,8 +1,10 @@
 #ifndef MAP.H
 #define MAP.H
 
-// Comenzamos definiendo lo que es el pair del mapa.
-// Y la estructura Map, que es variable dependiendo de su aplicación.
+/*
+Comenzamos definiendo lo que es el pair del mapa.
+Y la estructura Map, que es variable dependiendo de su aplicación.
+*/
 
 typedef struct {
     void *key;
