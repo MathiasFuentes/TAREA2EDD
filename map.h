@@ -1,5 +1,5 @@
-#ifndef MAP.H
-#define MAP.H
+#ifndef MAP_H
+#define MAP_H
 
 /*
 Comenzamos definiendo lo que es el pair del mapa.
