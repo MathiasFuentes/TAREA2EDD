@@ -13,20 +13,6 @@ typedef struct {
     char track_genre[100];
 } Canciones;
 
-void limpiarPantalla() {
-#ifdef _WIN32
-    system("cls");  // Windows
-#else
-    system("clear"); // Linux y macOS
-#endif
-}
-
-void presioneTeclaParaContinuar() {
-    printf("\nPresiona Enter para continuar...");
-    while (getchar() != '\n');
-    getchar();
-}
-
 void mostrarMenuPrincipal() {
     limpiarPantalla();
     puts("========================================");
