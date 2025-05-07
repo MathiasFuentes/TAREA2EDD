@@ -21,7 +21,6 @@ typedef struct {
     char track_name[MAX_TRACK];
     char track_genre[MAX_GENRE];
     float tempo;
-    float prueba;
 } tipoCancion;
 
 void mostrarMenuPrincipal() {
