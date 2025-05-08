@@ -12,7 +12,7 @@
 #define MAX_TRACK 512
 #define MAX_GENRE 256
 
-//  Definición del struct tipoCanción
+// --- Estructuras ---
 
 typedef struct {
     char id[MAX_ID];
@@ -27,6 +27,18 @@ typedef struct {
     char artist[MAX_ARTIST];
     List* canciones;
 } tipoArtista;
+
+// --- Variables globales ---
+
+Map* mapaCancionesPorID;
+Map* mapaArtistas;
+Map* mapaGeneros;
+
+List* cancionesLentas;
+List* cancionesModeradas;
+List* cancionesRapidas;
+
+// --- Funciones del programa ---
 
 void mostrarMenuPrincipal() {
     limpiarPantalla();
@@ -44,16 +56,19 @@ void mostrarMenuPrincipal() {
 }
 
 void cargar_canciones() {
-    FILE *archivo = fopen("data/song_dataset_.csv", "r");
+    char ruta[256];
+    printf("Ingrese la ruta del archivo CSV: ");
+    scanf(" %[^\n]", ruta);
+
+    FILE *archivo = fopen(ruta, "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo");
         return;
     }
 
-    char **campos;
-    campos = leer_linea_csv(archivo, ','); // leer encabezado
-
+    char **campos = leer_linea_csv(archivo, ','); // Leer encabezado
     int contador = 0;
+
     while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
         tipoCancion* cancion = (tipoCancion*) malloc(sizeof(tipoCancion));
         if (cancion == NULL) continue;
@@ -66,21 +81,17 @@ void cargar_canciones() {
         cancion->tempo = atof(campos[18]);
 
         // Guardar por ID
-        map_insert(mapaCancionesPorID, strdup(cancion->id), cancion);
+        insertMap(mapaCancionesPorID, strdup(cancion->id), cancion);
 
         // Guardar por artista
         List* artistas = split_string(cancion->artist, ";");
         for (char* artista = list_first(artistas); artista != NULL; artista = list_next(artistas)) {
-            MapPair* par = map_search(mapaArtistas, artista);
-            tipoArtista* tArtista;
-
-            if (par == NULL) {
+            tipoArtista* tArtista = searchMap(mapaArtistas, artista);
+            if (tArtista == NULL) {
                 tArtista = (tipoArtista*) malloc(sizeof(tipoArtista));
                 strncpy(tArtista->artist, artista, MAX_ARTIST);
                 tArtista->canciones = list_create();
-                map_insert(mapaArtistas, strdup(artista), tArtista);
-            } else {
-                tArtista = par->value;
+                insertMap(mapaArtistas, strdup(artista), tArtista);
             }
             list_pushBack(tArtista->canciones, cancion);
         }
@@ -94,13 +105,10 @@ void cargar_canciones() {
             list_pushBack(cancionesRapidas, cancion);
 
         // Guardar por género
-        MapPair* generoPar = map_search(mapaGeneros, cancion->track_genre);
-        List* listaGenero;
-        if (generoPar == NULL) {
+        List* listaGenero = searchMap(mapaGeneros, cancion->track_genre);
+        if (listaGenero == NULL) {
             listaGenero = list_create();
-            map_insert(mapaGeneros, strdup(cancion->track_genre), listaGenero);
-        } else {
-            listaGenero = generoPar->value;
+            insertMap(mapaGeneros, strdup(cancion->track_genre), listaGenero);
         }
         list_pushBack(listaGenero, cancion);
 
@@ -111,26 +119,44 @@ void cargar_canciones() {
     printf("Se cargaron %d canciones correctamente.\n", contador);
 }
 
-int is_equal_string(void* key1, void* key2) {
-    return strcmp((char*)key1, (char*)key2) == 0;
+void buscar_por_genero() {
+    char generoBuscado[MAX_GENRE];
+    printf("Ingrese el género musical a buscar: ");
+    scanf(" %[^\n]", generoBuscado);
+
+    List* canciones = searchMap(mapaGeneros, generoBuscado);
+    if (canciones == NULL) {
+        printf("No se encontraron canciones con el género '%s'.\n", generoBuscado);
+        return;
+    }
+
+    tipoCancion* cancion = list_first(canciones);
+    int cantidad = 0;
+
+    printf("\nCanciones del género '%s':\n", generoBuscado);
+    while (cancion != NULL) {
+        printf("• %s - %s (%.2f BPM)\n", cancion->artist, cancion->track_name, cancion->tempo);
+        cancion = list_next(canciones);
+        cantidad++;
+    }
+
+    if (cantidad == 0)
+        printf("No hay canciones registradas para este género.\n");
+    else
+        printf("\nTotal: %d canción(es).\n", cantidad);
 }
 
-Map* mapaCancionesPorID;
-Map* mapaArtistas;
-Map* mapaGeneros;
-
-List* cancionesLentas;
-List* cancionesModeradas;
-List* cancionesRapidas;
+// --- Main ---
 
 int main() {
-    mapaCancionesPorID = map_create(is_equal_string);
-    mapaArtistas = map_create(is_equal_string);
-    mapaGeneros = map_create(is_equal_string);
+    mapaCancionesPorID = createMap(hash_string, is_equal_string);
+    mapaArtistas = createMap(hash_string, is_equal_string);
+    mapaGeneros = createMap(hash_string, is_equal_string);
 
     cancionesLentas = list_create();
     cancionesModeradas = list_create();
     cancionesRapidas = list_create();
+
     char opcion;
     do {
         mostrarMenuPrincipal();
@@ -142,7 +168,7 @@ int main() {
             cargar_canciones();
             break;
         case '2':
-            // buscar_por_genero();
+            buscar_por_genero();
             break;
         case '3':
             // buscar_por_artista();
