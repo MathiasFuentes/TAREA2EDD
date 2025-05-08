@@ -1,0 +1,15 @@
+# Ignorar configuración de Visual Studio Code
+.vscode/
+
+# Ignorar archivos binarios y compilados
+*.exe
+*.o
+*.obj
+
+# Ignorar archivos temporales
+*.tmp
+*.log
+*.bak
+
+# Ignorar archivos de respaldo
+*~
