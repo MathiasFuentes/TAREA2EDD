@@ -37,6 +37,11 @@
  * - La función asume que ninguna línea del CSV excede MAX_LINE_LENGTH
  * caracteres y que no hay más de MAX_FIELDS campos por línea.
  */
+
+ int is_equal_string(void* key1, void* key2);
+
+size_t hash_string(void* key);
+
 char **leer_linea_csv(FILE *archivo, char separador);
 
 List *split_string(const char *str, const char *delim);
