@@ -1,47 +1,30 @@
 #ifndef MAP_H
 #define MAP_H
 
-/*
-Comenzamos definiendo lo que es el pair del mapa.
-Y la estructura Map, que es variable dependiendo de su aplicación.
-*/
+#include <stdlib.h>
 
-typedef struct {
-    void *key;
-    void *value;
-} MapPair;
+typedef struct Pair {
+    void* key;
+    void* value;
+    struct Pair* next;
+} Pair;
 
-typedef struct Map Map;
-  
-/*
-Funciones:
-    map_create: crea e inicializa un mapa no ordenado, solo definiendo la función is_equal, retornando un puntero al mapa.
-    sorted_map_create: también crea un mapa, pero este se crea para que sea ordenado con la función lower_thanl, retorna un puntero al mapa.
-    
-    map_insert: se inserta un objeto en el mapa y se retorna un puntero al pair insertado.
-    map_remove: se elimina un objeto del mapa y retorna un puntero al pair eliminado.
-    map_search: se busca un objeto en el mapa y retorna el puntero al pair buscado.
+typedef struct Map {
+    Pair** buckets;
+    size_t capacity;
+    size_t size;
+    size_t (*hashFunction)(void* key);
+    int (*keyComparator)(void* key1, void* key2);
+} Map;
 
-    map_first: devuelve un puntero a la primera pair que contenga la menor clave del mapa.
-    map_next: devuelve un puntero al siguiente pair del mapa.
+Map* createMap(size_t (*hashFunction)(void*), int (*keyComparator)(void*, void*));
 
-    map_clean: libera la memoria del mapa.
-*/
+void insertMap(Map* map, void* key, void* value);
 
-Map *map_create(int (*is_equal)(void *key1, void *key2));
-  
-Map *sorted_map_create(int (*lower_than)(void *key1, void *key2));
-  
-void map_insert(Map *map, void *key, void *value);
-  
-MapPair *map_remove(Map *map, void *key);
-  
-MapPair *map_search(Map *map, void *key);
-  
-MapPair *map_first(Map *map);
-  
-MapPair *map_next(Map *map);
+void removeMap(Map* map, void* key);
 
-void map_clean(Map *map);
+void* searchMap(Map* map, void* key);
 
-#endif
+void destroyMap(Map* map);
+
+#endif // MAP_H
