@@ -27,4 +27,8 @@ void* searchMap(Map* map, void* key);
 
 void destroyMap(Map* map);
 
+void* firstMap(Map* map);
+
+void* nextMap(Map* map);
+
 #endif // MAP_H

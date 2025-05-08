@@ -118,3 +118,38 @@ void destroyMap(Map* map) {
     free(map->buckets);
     free(map);
 }
+
+static size_t iter_index = 0;
+static Pair* iter_pair = NULL;
+
+void* firstMap(Map* map) {
+    iter_index = 0;
+    iter_pair = NULL;
+
+    while (iter_index < map->capacity) {
+        if (map->buckets[iter_index]) {
+            iter_pair = map->buckets[iter_index];
+            return iter_pair->key;
+        }
+        iter_index++;
+    }
+    return NULL;
+}
+
+void* nextMap(Map* map) {
+    if (iter_pair && iter_pair->next) {
+        iter_pair = iter_pair->next;
+        return iter_pair->key;
+    }
+
+    iter_index++;
+    while (iter_index < map->capacity) {
+        if (map->buckets[iter_index]) {
+            iter_pair = map->buckets[iter_index];
+            return iter_pair->key;
+        }
+        iter_index++;
+    }
+    return NULL;
+}
+

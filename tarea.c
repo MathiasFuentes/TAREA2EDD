@@ -45,14 +45,14 @@ void mostrarMenuPrincipal() {
     puts("========================================");
     puts("      Base de Datos de Spotifind");
     puts("========================================");
-    puts("1) Cargar Canciones.");
-    puts("2) Buscar por Género.");
-    puts("3) Buscar por Artista.");
-    puts("4) Buscar por Tempo.");
-    puts("5) Crear Lista de Reproducción.");
-    puts("6) Agregar Canción a lista de Reproducción.");
-    puts("7) Mostrar canciones de una lista de Reproducción.");
-    puts("8) Salir.");
+    puts("(1)   Cargar Canciones.");
+    puts("(2)   Buscar por Género.");
+    puts("(3)   Buscar por Artista.");
+    puts("(4)   Buscar por Tempo.");
+    puts("(5)   Crear Lista de Reproducción.");
+    puts("(6)   Agregar Canción a lista de Reproducción.");
+    puts("(7)   Mostrar canciones de una lista de Reproducción.");
+    puts("(8)   Salir.");
 }
 
 void cargar_canciones() {
@@ -119,9 +119,18 @@ void cargar_canciones() {
     printf("Se cargaron %d canciones correctamente.\n", contador);
 }
 
-void buscar_por_genero() {
+void buscar_por_genero(Map* mapaGeneros) {
+    printf("Géneros disponibles:\n");
+
+    // Recorre las claves del mapa de géneros
+    void* key = firstMap(mapaGeneros);
+    while (key != NULL) {
+        printf("• %s\n", (char*)key);
+        key = nextMap(mapaGeneros);
+    }
+
     char generoBuscado[MAX_GENRE];
-    printf("Ingrese el género musical a buscar: ");
+    printf("\nIngrese el género musical a buscar: ");
     scanf(" %[^\n]", generoBuscado);
 
     List* canciones = searchMap(mapaGeneros, generoBuscado);
@@ -146,6 +155,7 @@ void buscar_por_genero() {
         printf("\nTotal: %d canción(es).\n", cantidad);
 }
 
+
 // --- Main ---
 
 int main() {
@@ -159,16 +169,21 @@ int main() {
 
     char opcion;
     do {
+        limpiarPantalla();
         mostrarMenuPrincipal();
         printf("Ingrese su opción: ");
         scanf(" %c", &opcion);
 
         switch (opcion) {
         case '1':
+            limpiarPantalla();
+            puts("------    CARGAR CANCIONES    ------");
             cargar_canciones();
             break;
         case '2':
-            buscar_por_genero();
+            limpiarPantalla();
+            puts("------    BUSCAR POR GÉNERO    ------");
+            buscar_por_genero(mapaGeneros);
             break;
         case '3':
             // buscar_por_artista();
