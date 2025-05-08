@@ -45,14 +45,14 @@ void mostrarMenuPrincipal() {
     puts("========================================");
     puts("      Base de Datos de Spotifind");
     puts("========================================");
-    puts("(1)   Cargar Canciones.");
-    puts("(2)   Buscar por Género.");
-    puts("(3)   Buscar por Artista.");
-    puts("(4)   Buscar por Tempo.");
-    puts("(5)   Crear Lista de Reproducción.");
-    puts("(6)   Agregar Canción a lista de Reproducción.");
-    puts("(7)   Mostrar canciones de una lista de Reproducción.");
-    puts("(8)   Salir.");
+    puts("1) Cargar Canciones.");
+    puts("2) Buscar por Género.");
+    puts("3) Buscar por Artista.");
+    puts("4) Buscar por Tempo.");
+    puts("5) Crear Lista de Reproducción.");
+    puts("6) Agregar Canción a lista de Reproducción.");
+    puts("7) Mostrar canciones de una lista de Reproducción.");
+    puts("8) Salir.");
 }
 
 void cargar_canciones() {
@@ -119,18 +119,9 @@ void cargar_canciones() {
     printf("Se cargaron %d canciones correctamente.\n", contador);
 }
 
-void buscar_por_genero(Map* mapaGeneros) {
-    printf("Géneros disponibles:\n");
-
-    // Recorre las claves del mapa de géneros
-    void* key = firstMap(mapaGeneros);
-    while (key != NULL) {
-        printf("• %s\n", (char*)key);
-        key = nextMap(mapaGeneros);
-    }
-
+void buscar_por_genero() {
     char generoBuscado[MAX_GENRE];
-    printf("\nIngrese el género musical a buscar: ");
+    printf("Ingrese el género musical a buscar: ");
     scanf(" %[^\n]", generoBuscado);
 
     List* canciones = searchMap(mapaGeneros, generoBuscado);
@@ -151,10 +142,31 @@ void buscar_por_genero(Map* mapaGeneros) {
 
     if (cantidad == 0)
         printf("No hay canciones registradas para este género.\n");
-    else
-        printf("\nTotal: %d canción(es).\n", cantidad);
 }
 
+void buscar_por_artista() {
+    char nombreArtista[MAX_ARTIST];
+    printf("Ingrese el nombre del artista: ");
+    scanf(" %[^\n]", nombreArtista);
+
+    tipoArtista* artista = searchMap(mapaArtistas, nombreArtista);
+    if (artista == NULL) {
+        printf("No se encontraron canciones del artista '%s'.\n", nombreArtista);
+        return;
+    }
+
+    printf("\nCanciones de '%s':\n", artista->artist);
+    tipoCancion* cancion = list_first(artista->canciones);
+    int cantidad = 0;
+    while (cancion != NULL) {
+        printf("• %s | Álbum: %s | Género: %s | Tempo: %.2f BPM\n",cancion->track_name,cancion->album_name,cancion->track_genre,cancion->tempo);
+        cancion = list_next(artista->canciones);
+        cantidad++;
+    }
+
+    if (cantidad == 0)
+        printf("No hay canciones registradas para este artista.\n");
+}
 
 // --- Main ---
 
@@ -169,24 +181,19 @@ int main() {
 
     char opcion;
     do {
-        limpiarPantalla();
         mostrarMenuPrincipal();
         printf("Ingrese su opción: ");
         scanf(" %c", &opcion);
 
         switch (opcion) {
         case '1':
-            limpiarPantalla();
-            puts("------    CARGAR CANCIONES    ------");
             cargar_canciones();
             break;
         case '2':
-            limpiarPantalla();
-            puts("------    BUSCAR POR GÉNERO    ------");
-            buscar_por_genero(mapaGeneros);
+            buscar_por_genero();
             break;
         case '3':
-            // buscar_por_artista();
+            buscar_por_artista();
             break;
         case '4':
             // buscar_por_tempo();
