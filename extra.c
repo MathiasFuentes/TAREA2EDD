@@ -4,6 +4,21 @@
 #define MAX_LINE_LENGTH 4096
 #define MAX_FIELDS      128
 
+int is_equal_string(void* key1, void* key2) {
+    return strcmp((char*)key1, (char*)key2) == 0;
+}
+
+
+size_t hash_string(void* key) {
+    char* str = (char*) key;
+    size_t hash = 0;
+    while (*str) {
+        hash = hash * 31 + (unsigned char)(*str);
+        str++;
+    }
+    return hash;
+}
+
 char **leer_linea_csv(FILE *archivo, char separador) {
     static char linea[MAX_LINE_LENGTH];
     static char *campos[MAX_FIELDS];
