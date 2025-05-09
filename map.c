@@ -122,7 +122,7 @@ void destroyMap(Map* map) {
 static size_t iter_index = 0;
 static Pair* iter_pair = NULL;
 
-void* firstMap(Map* map) {
+Pair* firstMap(Map* map) {
     iter_index = 0;
     iter_pair = NULL;
 
@@ -136,7 +136,7 @@ void* firstMap(Map* map) {
     return NULL;
 }
 
-void* nextMap(Map* map) {
+Pair* nextMap(Map* map) {
     if (iter_pair && iter_pair->next) {
         iter_pair = iter_pair->next;
         return iter_pair->key;
