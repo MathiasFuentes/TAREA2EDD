@@ -13,6 +13,8 @@ typedef struct Map {
     Pair** buckets;
     size_t capacity;
     size_t size;
+    size_t currentIndex;
+    Pair* currentPair;
     size_t (*hashFunction)(void* key);
     int (*keyComparator)(void* key1, void* key2);
 } Map;
@@ -27,8 +29,8 @@ void* searchMap(Map* map, void* key);
 
 void destroyMap(Map* map);
 
-void* firstMap(Map* map);
+Pair* firstMap(Map* map);
 
-void* nextMap(Map* map);
+Pair* nextMap(Map* map);
 
 #endif // MAP_H
