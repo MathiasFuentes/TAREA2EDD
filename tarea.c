@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAX_ARTIST 256
 #define MAX_ID 512
@@ -46,24 +47,28 @@ void mostrarMenuPrincipal() {
     puts("========================================");
     puts("      Base de Datos de Spotifind");
     puts("========================================");
-    puts("1) Cargar Canciones.");
-    puts("2) Buscar por Género.");
-    puts("3) Buscar por Artista.");
-    puts("4) Buscar por Tempo.");
-    puts("5) Crear Lista de Reproducción.");
-    puts("6) Agregar Canción a lista de Reproducción.");
-    puts("7) Mostrar canciones de una lista de Reproducción.");
-    puts("8) Salir.");
+    puts("(1)   Cargar Canciones.");
+    puts("(2)   Buscar por Género.");
+    puts("(3)   Buscar por Artista.");
+    puts("(4)   Buscar por Tempo.");
+    puts("(5)   Crear Lista de Reproducción.");
+    puts("(6)   Agregar Canción a lista de Reproducción.");
+    puts("(7)   Mostrar canciones de una lista de Reproducción.");
+    puts("(8)   Salir.");
 }
 
 void cargar_canciones() {
+    puts("========================================");
+    puts("          Cargar Canciones");
+    puts("========================================");
+
     char ruta[256];
     printf("Ingrese la ruta del archivo CSV: ");
     scanf(" %[^\n]", ruta);
 
     FILE *archivo = fopen(ruta, "r");
     if (archivo == NULL) {
-        perror("Error al abrir el archivo");
+        perror("Error al abrir el archivo :( ...");
         return;
     }
 
@@ -117,13 +122,32 @@ void cargar_canciones() {
     }
 
     fclose(archivo);
-    printf("Se cargaron %d canciones correctamente.\n", contador);
+    puts("\nProceso completado de forma exitosa !! :D");
+    printf("Se cargaron %d canciones correctamente.\n\n", contador);
+}
+
+void normalizar_genero(char* genero) {
+    for (int i = 0; genero[i]; i++) {
+        if (genero[i] == ' ')
+            genero[i] = '-';
+        else
+            genero[i] = tolower(genero[i]);
+    }
 }
 
 void buscar_por_genero() {
     char generoBuscado[MAX_GENRE];
+
+    Pair* par = firstMap(mapaGeneros);
+    while (par != NULL) {
+        printf("• %s\n", (char*)par->key);
+        par = nextMap(mapaGeneros);
+    }
+
     printf("Ingrese el género musical a buscar: ");
     scanf(" %[^\n]", generoBuscado);
+
+    normalizar_genero(generoBuscado);
 
     List* canciones = searchMap(mapaGeneros, generoBuscado);
     if (canciones == NULL) {
@@ -315,9 +339,11 @@ int main() {
 
         switch (opcion) {
         case '1':
+            limpiarPantalla();
             cargar_canciones();
             break;
         case '2':
+            limpiarPantalla();
             buscar_por_genero();
             break;
         case '3':
