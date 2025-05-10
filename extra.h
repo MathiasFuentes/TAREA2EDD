@@ -51,4 +51,8 @@ void limpiarPantalla();
 
 void presioneTeclaParaContinuar();
 
+int archivoYaCargado(List *archivosCargados, const char *nombreArchivo);
+
+void registrarArchivoCargado(List *archivosCargados, const char *nombreArchivo);
+
 #endif

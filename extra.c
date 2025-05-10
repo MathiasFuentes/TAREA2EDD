@@ -118,7 +118,22 @@ void limpiarPantalla() {
     }
     
 void presioneTeclaParaContinuar() {
-  puts("Presione una tecla para continuar...");
+  puts("\nPresione una tecla para continuar...");
   getchar(); // Consume el '\n' del buffer de entrada
   getchar(); // Espera a que el usuario presione una tecla
+}
+
+int archivoYaCargado(List *archivosCargados, const char *nombreArchivo) {
+  for (char *nombre = list_first(archivosCargados); nombre != NULL; nombre = list_next(archivosCargados)) {
+    if (strcmp(nombre, nombreArchivo) == 0) {
+      return 1; // Ya fue cargado
+    }
+  }
+  return 0;
+}
+
+void registrarArchivoCargado(List *archivosCargados, const char *nombreArchivo) {
+  // Asegúrate de guardar una copia del string si no es constante
+  char *copia = strdup(nombreArchivo);
+  list_pushBack(archivosCargados, copia);
 }
