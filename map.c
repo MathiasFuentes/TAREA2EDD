@@ -129,7 +129,7 @@ Pair* firstMap(Map* map) {
     while (iter_index < map->capacity) {
         if (map->buckets[iter_index]) {
             iter_pair = map->buckets[iter_index];
-            return iter_pair->key;
+            return iter_pair;
         }
         iter_index++;
     }
@@ -139,17 +139,18 @@ Pair* firstMap(Map* map) {
 Pair* nextMap(Map* map) {
     if (iter_pair && iter_pair->next) {
         iter_pair = iter_pair->next;
-        return iter_pair->key;
+        return iter_pair;
     }
 
     iter_index++;
     while (iter_index < map->capacity) {
         if (map->buckets[iter_index]) {
             iter_pair = map->buckets[iter_index];
-            return iter_pair->key;
+            return iter_pair;
         }
         iter_index++;
     }
     return NULL;
 }
+
 
