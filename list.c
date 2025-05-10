@@ -184,6 +184,15 @@ void *list_popCurrent(List *L) {
   return data;
 }
 
+int list_exist(List *lista, void *dato, int (*comparar)(void *, void *)) {
+  for (void *item = list_first(lista); item != NULL; item = list_next(lista)) {
+    if (comparar(item, dato) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void list_clean(List *L) {
   if (L == NULL) {
     return; // Lista no inicializada
