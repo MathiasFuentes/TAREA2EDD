@@ -40,6 +40,8 @@ List* cancionesLentas;
 List* cancionesModeradas;
 List* cancionesRapidas;
 
+List* archivosCargados;
+
 // --- Funciones del programa ---
 
 void mostrarMenuPrincipal() {
@@ -57,6 +59,12 @@ void mostrarMenuPrincipal() {
     puts("(8)   Salir.");
 }
 
+int compararCanciones(void *a, void *b) {
+  tipoCancion *c1 = (tipoCancion *)a;
+  tipoCancion *c2 = (tipoCancion *)b;
+  return strcmp(c1->id, c2->id); // o comparar más campos si quieres
+}
+
 void cargar_canciones() {
     puts("========================================");
     puts("          Cargar Canciones");
@@ -65,6 +73,13 @@ void cargar_canciones() {
     char ruta[256];
     printf("Ingrese la ruta del archivo CSV: ");
     scanf(" %[^\n]", ruta);
+
+    if (archivoYaCargado(archivosCargados, ruta)){
+        printf("Cuidado! el Archivo %s ya fue cargado antes...\n", ruta);
+        return;
+    }
+
+    registrarArchivoCargado(archivosCargados, ruta);
 
     FILE *archivo = fopen(ruta, "r");
     if (archivo == NULL) {
@@ -79,6 +94,7 @@ void cargar_canciones() {
         tipoCancion* cancion = (tipoCancion*) malloc(sizeof(tipoCancion));
         if (cancion == NULL) continue;
 
+
         strncpy(cancion->id, campos[0], MAX_ID);
         strncpy(cancion->artist, campos[2], MAX_ARTIST);
         strncpy(cancion->album_name, campos[3], MAX_ALBUM);
@@ -87,8 +103,10 @@ void cargar_canciones() {
         cancion->tempo = atof(campos[18]);
 
         // Guardar por ID
-        insertMap(mapaCancionesPorID, strdup(cancion->id), cancion);
-
+        if (searchMap(mapaCancionesPorID, cancion->id) == NULL){
+            insertMap(mapaCancionesPorID, strdup(cancion->id), cancion);
+        }
+        else { continue; }
         // Guardar por artista
         List* artistas = split_string(cancion->artist, ";");
         for (char* artista = list_first(artistas); artista != NULL; artista = list_next(artistas)) {
@@ -123,7 +141,13 @@ void cargar_canciones() {
 
     fclose(archivo);
     puts("\nProceso completado de forma exitosa !! :D");
-    printf("Se cargaron %d canciones correctamente.\n\n", contador);
+    printf("Se cargaron %d canciones correctamente.\n", contador);
+}
+
+int comparar_canciones(const void *a, const void *b) {
+    tipoCancion* cancionA = *(tipoCancion**)a;
+    tipoCancion* cancionB = *(tipoCancion**)b;
+    return strcmp(cancionA->track_name, cancionB->track_name);
 }
 
 void normalizar_genero(char* genero) {
@@ -136,8 +160,16 @@ void normalizar_genero(char* genero) {
 }
 
 void buscar_por_genero() {
-    char generoBuscado[MAX_GENRE];
+    
+    if (firstMap(mapaGeneros) == NULL){
+        puts("No se han encontrado géneros disponibles :(");
+        return;
+    }
 
+    char generoBuscado[MAX_GENRE];
+    puts("========================================");
+    puts("          Géneros Disponibles");
+    puts("========================================");
     Pair* par = firstMap(mapaGeneros);
     while (par != NULL) {
         printf("• %s\n", (char*)par->key);
@@ -160,7 +192,13 @@ void buscar_por_genero() {
 
     printf("\nCanciones del género '%s':\n", generoBuscado);
     while (cancion != NULL) {
-        printf("• %s - %s (%.2f BPM)\n", cancion->artist, cancion->track_name, cancion->tempo);
+        // printf("• %s - %s (%.2f BPM)\n", cancion->artist, cancion->track_name, cancion->tempo);
+
+        printf("# %d\n", cantidad + 1);
+        printf("Artista:    %s\n", cancion->artist);
+        printf("Título:     %s\n", cancion->track_name);
+        printf("BPM:        %.2f\n\n", cancion->tempo);
+
         cancion = list_next(canciones);
         cantidad++;
     }
@@ -330,6 +368,8 @@ int main() {
     cancionesLentas = list_create();
     cancionesModeradas = list_create();
     cancionesRapidas = list_create();
+
+    archivosCargados = list_create();
 
     char opcion;
     do {
