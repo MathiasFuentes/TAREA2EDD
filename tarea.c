@@ -425,10 +425,19 @@ void crear_lista_reproduccion() {
 /*
     Función agregar_a_lista:
     Pide al usuario el ID de una canción y el nombre de una lista de reproducción.
-    Busca la canción en el mapa por ID y la lista en el mapa de listas. 
-    Si ambos existen, se agrega la canción al final de la lista y se informa al usuario del éxito.
-    Si no se encuentra la canción o la lista, se muestra un mensaje de error adecuado.
+    Busca la canción en el mapa por ID y la lista en el mapa de listas de reproducción.
+    Si ambos existen, verifica que la canción no esté repetida en la lista usando la función `list_exist`.
+    Si la canción no está repetida, se agrega al final de la lista y se informa al usuario del éxito.
+    Si la canción o la lista no existen, se muestra un mensaje de error adecuado.
+    Si la canción ya está en la lista, se informa al usuario que ya se encuentra agregada.
 */
+
+int compararCancionesPorID(void* a, void* b) {
+    tipoCancion* cancionA = (tipoCancion*)a;
+    tipoCancion* cancionB = (tipoCancion*)b;
+
+    return strcmp(cancionA->id, cancionB->id);
+}
 
 void agregar_a_lista() {
     puts("========================================");
@@ -452,6 +461,11 @@ void agregar_a_lista() {
     List* lista = searchMap(listasReproduccion, nombreLista);
     if (lista == NULL) {
         printf("No existe una lista con el nombre '%s' :( \n", nombreLista);
+        return;
+    }
+    
+    if (list_exist(lista, cancion, compararCancionesPorID)) {
+        printf("\nLa canción '%s' ya está en la lista '%s' :O !!!\n", cancion->track_name, nombreLista);
         return;
     }
 
