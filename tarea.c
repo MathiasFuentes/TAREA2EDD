@@ -207,22 +207,52 @@ void buscar_por_genero() {
         printf("No hay canciones registradas para este género.\n");
 }
 
+void formatearTitleCase(char* str) {
+    int i = 0;
+    int capitalizar = 1;
+
+    while (str[i] != '\0') {
+        if (isspace(str[i])) {
+            capitalizar = 1;
+        } else {
+            if (capitalizar && isalpha(str[i])) {
+                str[i] = toupper(str[i]);
+                capitalizar = 0;
+            } else {
+                str[i] = tolower(str[i]);
+            }
+        }
+        i++;
+    }
+}
+
 void buscar_por_artista() {
+    puts("========================================");
+    puts("         Búsqueda por Artista");
+    puts("========================================");
     char nombreArtista[MAX_ARTIST];
-    printf("Ingrese el nombre del artista: ");
+    printf("\nIngrese el nombre del artista: ");
     scanf(" %[^\n]", nombreArtista);
+    formatearTitleCase(nombreArtista);
 
     tipoArtista* artista = searchMap(mapaArtistas, nombreArtista);
     if (artista == NULL) {
-        printf("No se encontraron canciones del artista '%s'.\n", nombreArtista);
+        printf("No se encontraron canciones del artista '%s' :( \n", nombreArtista);
         return;
     }
 
-    printf("\nCanciones de '%s':\n", artista->artist);
+    printf("\nCanciones de '%s':\n\n", artista->artist);
     tipoCancion* cancion = list_first(artista->canciones);
     int cantidad = 0;
     while (cancion != NULL) {
-        printf("• %s | Álbum: %s | Género: %s | Tempo: %.2f BPM\n",cancion->track_name,cancion->album_name,cancion->track_genre,cancion->tempo);
+
+        printf("Título: %s\n", cancion->track_name);
+        printf("ID:     %s\n", cancion->id);
+        printf("Álbum:  %s\n", cancion->album_name);
+        printf("Género: %s\n", cancion->track_genre);
+        printf("Tempo:  %.2f BPM\n\n", cancion->tempo);
+
+        // printf("• %s | Álbum: %s | Género: %s | Tempo: %.2f BPM\n",cancion->track_name,cancion->album_name,cancion->track_genre,cancion->tempo);
         cancion = list_next(artista->canciones);
         cantidad++;
     }
@@ -231,15 +261,42 @@ void buscar_por_artista() {
         printf("No hay canciones registradas para este artista.\n");
 }
 
-void buscar_por_tempo() {
+char leer_opcion_tempo(){
     char opcion;
-    printf("Seleccione el tipo de tempo:\n");
-    printf("1) Lentas (menos de 80 BPM)\n");
-    printf("2) Moderadas (80 a 120 BPM)\n");
-    printf("3) Rápidas (más de 120 BPM)\n");
-    printf("Ingrese su opción: ");
-    scanf(" %c", &opcion);
+    int valido = 0;
 
+    do {
+        puts("========================================");
+        puts("          BÚSQUEDA POR TEMPO");
+        puts("========================================");
+        puts("Seleccione una opción:");
+        puts("  (1) Lentas     - Menos de 80 BPM");
+        puts("  (2) Moderadas  - Entre 80 y 120 BPM");
+        puts("  (3) Rápidas    - Más de 120 BPM");
+        printf("Ingrese su opción (1/2/3): ");
+
+        // Lee solo un carácter
+        if (scanf(" %c", &opcion) == 1) {
+            while (getchar() != '\n');  // Limpiar buffer
+            if (opcion == '1' || opcion == '2' || opcion == '3') {
+                valido = 1;
+            } else {
+                limpiarPantalla();
+                printf("---Opción inválida. Intente nuevamente---\n\n");
+            }
+        } else {
+            limpiarPantalla();
+            printf("---Error de entrada. Intente nuevamente---\n\n");
+            while (getchar() != '\n');  // Limpiar buffer en caso de error
+        }
+    } while (!valido);
+
+    return opcion;
+}
+
+
+void buscar_por_tempo() {
+    char opcion = leer_opcion_tempo();
     List* lista = NULL;
     const char* tipo = "";
 
@@ -387,9 +444,11 @@ int main() {
             buscar_por_genero();
             break;
         case '3':
+            limpiarPantalla();
             buscar_por_artista();
             break;
         case '4':
+            limpiarPantalla();
             buscar_por_tempo();
             break;
         case '5':
