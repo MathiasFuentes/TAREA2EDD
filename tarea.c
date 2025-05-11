@@ -15,33 +15,38 @@
 
 // --- Estructuras ---
 
-typedef struct {
-    char id[MAX_ID];
-    char artist[MAX_ARTIST];
-    char album_name[MAX_ALBUM];
-    char track_name[MAX_TRACK];
-    char track_genre[MAX_GENRE];
-    float tempo;
+// Estructura de representa una canción y los datos de la misma.
+typedef struct { 
+    char id[MAX_ID];                // ID único de la canción.
+    char artist[MAX_ARTIST];        // Nombre del autor/es de la canción.
+    char album_name[MAX_ALBUM];     // Nombre del álbum al que la canción pertenece.
+    char track_name[MAX_TRACK];     // Nombre de la canción.
+    char track_genre[MAX_GENRE];    // Nombre del género al que pertenece la canción.
+    float tempo;                    // Tempo en BPM (Beats per Minute) de la canción.
 } tipoCancion;
 
+// Estructura que representa un artista y una lista de canciones asociada.
 typedef struct {
-    char artist[MAX_ARTIST];
-    List* canciones;
+    char artist[MAX_ARTIST];        // Nombre del artista.
+    List* canciones;                // Lista de canciones del artista.
 } tipoArtista;
+
 
 // --- Variables globales ---
 
-Map* mapaCancionesPorID;
-Map* mapaArtistas;
-Map* mapaGeneros;
-Map* listasReproduccion;
+Map* mapaCancionesPorID;            // Mapa para guardar cada canción por su ID único.
+Map* mapaArtistas;                  // Mapa para guardar cada artista.
+Map* mapaGeneros;                   // Mapa para guardar todos los géneros incluidos.
+Map* listasReproduccion;            // Mapa para guardar todas las playlist creadas.
 
-List* cancionesLentas;
-List* cancionesModeradas;
-List* cancionesRapidas;
+List* cancionesLentas;              // Lista que guarda todas las canciones con tempo < 80 BPM.
+List* cancionesModeradas;           // Lista que guarda todas las canciones con tempo entre 80 y 120 BPM.
+List* cancionesRapidas;             // Lista que guarda todas las canciones con tempo mayor a 120 BPM.
 
-List* archivosCargados;
+List* archivosCargados;             // Lista que guarda el nombre de todos los archivos csv ya cargados,
+                                    // esto asegura que no se cargue 2 veces un mismo archivo.
 
+                                    
 // --- Funciones del programa ---
 
 void mostrarMenuPrincipal() {
@@ -59,6 +64,7 @@ void mostrarMenuPrincipal() {
     puts("(8)   Salir.");
 }
 
+// 
 int compararCanciones(void *a, void *b) {
   tipoCancion *c1 = (tipoCancion *)a;
   tipoCancion *c2 = (tipoCancion *)b;
