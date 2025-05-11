@@ -43,4 +43,7 @@ int list_exist(List *lista, void *dato, int (*comparar)(void *, void *));
 // Función que devuelve el size de una lista.
 int list_size(List* L);
 
+// Función que libera la memoria de una lista.
+void list_destroy_with(List* list, void (*free_data)(void*));
+
 #endif
