@@ -271,7 +271,6 @@ void buscar_por_genero() {
     se informa al usuario por pantalla.
 */
 
-
 void buscar_por_artista() {
     puts("========================================");
     puts("         Búsqueda por Artista");
@@ -311,6 +310,13 @@ void buscar_por_artista() {
     }
 }
 
+/*
+    Función leer_opcion_tempo:
+    Esta función muestra un menú con tres opciones de tempo (lento, moderado y rápido) y solicita al usuario seleccionar una.
+    Se valida que la opción ingresada sea correcta ('1', '2' o '3') y, en caso contrario, se limpia la pantalla y se pide nuevamente.
+    Una vez validada, se retorna la opción elegida por el usuario.
+*/
+
 char leer_opcion_tempo(){
     char opcion;
     int valido = 0;
@@ -343,6 +349,13 @@ char leer_opcion_tempo(){
 
     return opcion;
 }
+
+/*
+    Función buscar por tempo:
+    Utiliza la opción obtenida por la función leer_opcion_tempo para seleccionar una lista de canciones según el rango de tempo:
+    lentas (<80 BPM), moderadas (80–120 BPM) o rápidas (>120 BPM). Luego, recorre la lista correspondiente, muestra la información
+    de cada canción y lleva un contador para mostrar cuántas canciones hay en esa categoría. Si no hay canciones, se informa al usuario.
+*/
 
 void buscar_por_tempo() {
     char opcion = leer_opcion_tempo();
@@ -382,6 +395,14 @@ void buscar_por_tempo() {
         printf("\nTotal: %d canción(es).\n", cantidad);
 }
 
+/*
+    Función crear_lista_reproduccion:
+    Solicita al usuario un nombre para una nueva lista de reproducción. 
+    Primero verifica si ya existe una lista con ese nombre en el mapa. 
+    Si no existe, se crea una nueva lista vacía y se inserta en el mapa de listas con el nombre proporcionado.
+    Finalmente, se notifica al usuario que la lista fue creada exitosamente.
+*/
+
 void crear_lista_reproduccion() {
     puts("========================================");
     puts("         CREACIÓN DE PLAYLIST");
@@ -400,6 +421,14 @@ void crear_lista_reproduccion() {
 
     printf("Lista '%s' creada exitosamente :D !!!\n", nombreLista);
 }
+
+/*
+    Función agregar_a_lista:
+    Pide al usuario el ID de una canción y el nombre de una lista de reproducción.
+    Busca la canción en el mapa por ID y la lista en el mapa de listas. 
+    Si ambos existen, se agrega la canción al final de la lista y se informa al usuario del éxito.
+    Si no se encuentra la canción o la lista, se muestra un mensaje de error adecuado.
+*/
 
 void agregar_a_lista() {
     puts("========================================");
@@ -431,6 +460,15 @@ void agregar_a_lista() {
     printf("'%s' de %s\n", cancion->track_name, cancion->artist);
     printf("Canción agregada exitosamente a la lista '%s' :D !!!\n", nombreLista);
 }
+
+/*
+    Función mostrar_lista:
+    Muestra todas las listas de reproducción creadas. 
+    Luego solicita al usuario seleccionar una de ellas ingresando su nombre.
+    Si la lista existe, muestra todas las canciones que contiene junto con su información relevante
+    (artista, nombre, álbum, género, tempo) y un contador que indica cuántas canciones tiene.
+    Si no hay listas o si la lista está vacía, también se notifica al usuario.
+*/
 
 void mostrar_lista() {
     if (firstMap(listasReproduccion) == NULL) {
@@ -477,6 +515,15 @@ void mostrar_lista() {
 }
 
 // --- Main ---
+
+/*
+    Función main:
+    Inicializa todos los mapas y listas necesarias para manejar canciones, artistas, géneros,
+    playlists y categorías de tempo. Luego entra en un ciclo donde se muestra el menú principal,
+    se pide una opción al usuario y se ejecuta la función correspondiente según su elección.
+    Se validan las entradas para evitar errores y se limpia la pantalla entre acciones.
+    El ciclo continúa hasta que el usuario selecciona la opción de salida (8) .
+*/
 
 int main() {
     mapaCancionesPorID = createMap(hash_string, is_equal_string);
