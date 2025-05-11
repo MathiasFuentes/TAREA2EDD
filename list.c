@@ -209,3 +209,17 @@ void list_clean(List *L) {
   L->current = NULL;
   L->size = 0;
 }
+
+void list_destroy_with(List* list, void (*free_data)(void*)) {
+    if (list == NULL) return;
+
+    Node* current = list->head;
+    while (current != NULL) {
+        Node* next = current->next;
+        if (free_data) free_data(current->data);
+        free(current);
+        current = next;
+    }
+
+    free(list);
+}
