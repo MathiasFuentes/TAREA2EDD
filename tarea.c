@@ -92,6 +92,7 @@ void mostrarMenuPrincipal() {
     7) Por último, se cierra el archivo .csv cargado y se entrega el mensaje correspondiente al usuario.
     
 */
+
 void cargar_canciones() {
     puts("========================================");
     puts("          Cargar Canciones");
@@ -193,6 +194,12 @@ void cargar_canciones() {
     printf("Se cargaron %d canciones correctamente.\n", contador);
 }
 
+/*
+    Función normalizar_genero:
+    se usa para que en la función buscar por género, no haya problemas con, por ejemplo, querer buscar el género "black-metal"
+    escribiendo "Black Metal", en resumen, facilitar al usuario la búsqueda de un género.
+*/
+
 void normalizar_genero(char* genero) {
     for (int i = 0; genero[i]; i++) {
         if (genero[i] == ' ')
@@ -202,6 +209,13 @@ void normalizar_genero(char* genero) {
     }
 }
 
+/*
+    Función buscar por género:
+    Para buscar todas las canciones de un género, primero se comprueba que existan géneros, si existen, se muestran los que hay disponibles, 
+    después, si es que el usuario ingresó un género válido, se recorre la lista de las canciones del género buscado, mostrando por pantalla
+    la información de cada una, junto a un contador para identificar cuantas canciones hay en ese género. Si no hay canciones registradas para
+    el género, se hace saber por pantalla.
+*/
 void buscar_por_genero() {
     
     if (firstMap(mapaGeneros) == NULL){
@@ -221,7 +235,6 @@ void buscar_por_genero() {
 
     printf("Ingrese el género musical a buscar: ");
     scanf(" %[^\n]", generoBuscado);
-
     normalizar_genero(generoBuscado);
 
     List* canciones = searchMap(mapaGeneros, generoBuscado);
@@ -249,6 +262,15 @@ void buscar_por_genero() {
     if (cantidad == 0)
         printf("No hay canciones registradas para este género.\n");
 }
+
+/*
+    Función buscar por artista:
+    Para buscar todas las canciones de un artista, primero se solicita al usuario el nombre del artista. Luego se comprueba si el artista existe
+    en el mapa de artistas. Si existe, se recorre la lista de canciones asociadas al artista, mostrando por pantalla la información de cada una,
+    junto a un contador para identificar cuántas canciones hay registradas de dicho artista. Si no se encuentra el artista o no hay canciones,
+    se informa al usuario por pantalla.
+*/
+
 
 void buscar_por_artista() {
     puts("========================================");
