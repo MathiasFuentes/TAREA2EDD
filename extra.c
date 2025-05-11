@@ -133,7 +133,6 @@ int archivoYaCargado(List *archivosCargados, const char *nombreArchivo) {
 }
 
 void registrarArchivoCargado(List *archivosCargados, const char *nombreArchivo) {
-  // Asegúrate de guardar una copia del string si no es constante
   char *copia = strdup(nombreArchivo);
   list_pushBack(archivosCargados, copia);
 }
