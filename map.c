@@ -7,7 +7,13 @@
 #define INITIAL_CAPACITY 1000000
 #define LOAD_FACTOR 0.75
 
-// Crear un nuevo mapa
+/*
+    Función createMap:
+    Inicializa y reserva memoria para un nuevo mapa hash, configurando su capacidad inicial,
+    asignando su arreglo de buckets y asociando las funciones hash y de comparación entregadas
+    como parámetros. Este mapa permite almacenar pares clave-valor de forma eficiente.
+*/
+
 Map* createMap(size_t (*hashFunction)(void*), int (*keyComparator)(void*, void*)) {
     Map* map = malloc(sizeof(Map));
     map->capacity = INITIAL_CAPACITY;
@@ -18,7 +24,14 @@ Map* createMap(size_t (*hashFunction)(void*), int (*keyComparator)(void*, void*)
     return map;
 }
 
-// Redimensionar el mapa cuando se excede el factor de carga
+/*
+    Función resizeMap:
+    Duplica la capacidad del mapa cuando se supera el factor de carga.
+    Reasigna y reubica todos los pares clave-valor en el nuevo arreglo de buckets,
+    utilizando la función de hash para determinar su nueva posición.
+    También libera la memoria de los pares antiguos.
+*/
+
 void resizeMap(Map* map) {
     size_t oldCapacity = map->capacity;
     Pair** oldBuckets = map->buckets;
@@ -39,7 +52,13 @@ void resizeMap(Map* map) {
     free(oldBuckets);
 }
 
-// Insertar un par clave-valor en el mapa
+/*
+    Función insertMap:
+    Inserta un nuevo par clave-valor en el mapa. Si la clave ya existe, reemplaza su valor.
+    Antes de insertar, verifica si se debe redimensionar el mapa según el factor de carga.
+    Usa la función de hash para ubicar el bucket correspondiente y gestiona colisiones con encadenamiento.
+*/
+
 void insertMap(Map* map, void* key, void* value) {
     
     if ((double)map->size / map->capacity >= LOAD_FACTOR) {
@@ -68,7 +87,13 @@ void insertMap(Map* map, void* key, void* value) {
 }
 
 
-// Remover un elemento del mapa.
+/*
+    Función removeMap:
+    Elimina del mapa un par clave-valor dado su clave. Si se encuentra, se ajustan los punteros
+    del bucket correspondiente para excluir el par y se libera su memoria.
+    Disminuye el tamaño del mapa al remover correctamente.
+*/
+
 void removeMap(Map* map, void* key) {
     size_t index = map->hashFunction(key) % map->capacity;
     Pair* current = map->buckets[index];
@@ -92,7 +117,12 @@ void removeMap(Map* map, void* key) {
     }
 }
 
-// Buscar un valor dado su clave
+/*
+    Función searchMap:
+    Busca en el mapa un valor asociado a una clave determinada.
+    Devuelve el valor si se encuentra la clave; de lo contrario, retorna NULL.
+*/
+ 
 void* searchMap(Map* map, void* key) {
     size_t index = map->hashFunction(key) % map->capacity;
     Pair* current = map->buckets[index];
@@ -105,7 +135,12 @@ void* searchMap(Map* map, void* key) {
     return NULL;
 }
 
-// Liberar la memoria del mapa
+/*
+    Función destroyMap:
+    Libera toda la memoria asociada al mapa, incluyendo cada uno de los pares en los buckets,
+    el arreglo de buckets y la estructura del mapa en sí.
+*/
+
 void destroyMap(Map* map) {
     for (size_t i = 0; i < map->capacity; ++i) {
         Pair* current = map->buckets[i];
@@ -122,6 +157,13 @@ void destroyMap(Map* map) {
 static size_t iter_index = 0;
 static Pair* iter_pair = NULL;
 
+/*
+    Función firstMap:
+    Inicializa la iteración sobre el mapa y retorna el primer par clave-valor encontrado.
+    Utiliza variables estáticas para mantener el estado de la iteración.
+    Si el mapa está vacío, retorna NULL.
+*/
+
 Pair* firstMap(Map* map) {
     iter_index = 0;
     iter_pair = NULL;
@@ -135,6 +177,13 @@ Pair* firstMap(Map* map) {
     }
     return NULL;
 }
+
+/*
+    Función nextMap:
+    Retorna el siguiente par clave-valor del mapa tras una llamada a firstMap.
+    Avanza dentro del bucket actual o continúa con los siguientes buckets si es necesario.
+    Retorna NULL si no hay más elementos.
+*/
 
 Pair* nextMap(Map* map) {
     if (iter_pair && iter_pair->next) {
