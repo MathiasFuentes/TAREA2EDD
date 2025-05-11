@@ -46,9 +46,10 @@ List* cancionesRapidas;             // Lista que guarda todas las canciones con 
 List* archivosCargados;             // Lista que guarda el nombre de todos los archivos csv ya cargados,
                                     // esto asegura que no se cargue 2 veces un mismo archivo.
 
-                                    
+
 // --- Funciones del programa ---
 
+// Función para mostrar el menú principal cada vez que se termine una operación en el menú.
 void mostrarMenuPrincipal() {
     limpiarPantalla();
     puts("========================================");
@@ -64,18 +65,39 @@ void mostrarMenuPrincipal() {
     puts("(8)   Salir.");
 }
 
-// 
-int compararCanciones(void *a, void *b) {
-  tipoCancion *c1 = (tipoCancion *)a;
-  tipoCancion *c2 = (tipoCancion *)b;
-  return strcmp(c1->id, c2->id); // o comparar más campos si quieres
-}
+/*
+    Función cargar_canciones:
+    1)  Esta función, primero asegura que el nombre del archivo .csv ingresado en "ruta" no esté repetido,
+        si es que lo está, se notifica. En caso contrario, se registra el nombre para que después no se 
+        vuelva a cargar.
 
+    2)  Luego, abre el archivo en modo lectura para obtener sus datos, si no se logra abrir el archivo, se
+        notifica por pantalla al usuario.
+    
+    3)  Se leen las líneas del archivo .csv hasta que se complete, así, almacenando por cada canción sus 
+        datos correspondientes, si es que el ID de la canción coincide con otra ya almacenada, se libera
+        la memoria reservada por la repetida y se continúa a la siguiente canción. Además, se inicia un
+        contador en 0 para mostrar al final del proceso cuantas canciones se incluyeron.
+    
+    4)  Se lee la línea que compone al autor/es de la canción, revisando que no esté repetido cada uno, si no
+        lo está, se almacenan sus datos y se guardan en el mapa de artistas, además de almacenar la canción
+        procesada en la lista de canciones de tal artista.
+
+    5)  Se verifica el tempo de la canción y dependiendo de sus BPM, se guarda en su lista respectiva.
+
+    6)  Después, se verifica si el género de la canción existe, si no existe, se crea una lista de canciones
+        de ese género y se guarda ahí la canción, además de guardar el nuevo género en su mapa correspondiente, si el género
+        ya existe, simplemente se guarda la canción en la lista del respectivo género.
+    
+    7) Por último, se cierra el archivo .csv cargado y se entrega el mensaje correspondiente al usuario.
+    
+*/
 void cargar_canciones() {
     puts("========================================");
     puts("          Cargar Canciones");
     puts("========================================");
 
+    // Primera parte.
     char ruta[256];
     printf("Ingrese la ruta del archivo CSV: ");
     scanf(" %[^\n]", ruta);
@@ -84,49 +106,69 @@ void cargar_canciones() {
         printf("Cuidado! el Archivo %s ya fue cargado antes...\n", ruta);
         return;
     }
-
     registrarArchivoCargado(archivosCargados, ruta);
 
+    // Segunda parte.
     FILE *archivo = fopen(ruta, "r");
     if (archivo == NULL) {
         perror("Error al abrir el archivo :( ...");
         return;
     }
 
-    char **campos = leer_linea_csv(archivo, ','); // Leer encabezado
+    // Tercera parte    
+    char **campos = leer_linea_csv(archivo, ','); 
     int contador = 0;
 
     while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
+
         tipoCancion* cancion = (tipoCancion*) malloc(sizeof(tipoCancion));
         if (cancion == NULL) continue;
 
-
         strncpy(cancion->id, campos[0], MAX_ID);
+        cancion->id[MAX_ID - 1] = '\0';
+
         strncpy(cancion->artist, campos[2], MAX_ARTIST);
+        cancion->artist[MAX_ARTIST - 1] = '\0';
+
         strncpy(cancion->album_name, campos[3], MAX_ALBUM);
+        cancion->album_name[MAX_ALBUM - 1] = '\0';
+
         strncpy(cancion->track_name, campos[4], MAX_TRACK);
+        cancion->track_name[MAX_TRACK - 1] = '\0';
+
         strncpy(cancion->track_genre, campos[20], MAX_GENRE);
+        cancion->track_genre[MAX_GENRE - 1] = '\0';
+
         cancion->tempo = atof(campos[18]);
 
-        // Guardar por ID
         if (searchMap(mapaCancionesPorID, cancion->id) == NULL){
             insertMap(mapaCancionesPorID, strdup(cancion->id), cancion);
         }
-        else { continue; }
-        // Guardar por artista
-        List* artistas = split_string(cancion->artist, ";");
-        for (char* artista = list_first(artistas); artista != NULL; artista = list_next(artistas)) {
-            tipoArtista* tArtista = searchMap(mapaArtistas, artista);
-            if (tArtista == NULL) {
-                tArtista = (tipoArtista*) malloc(sizeof(tipoArtista));
-                strncpy(tArtista->artist, artista, MAX_ARTIST);
-                tArtista->canciones = list_create();
-                insertMap(mapaArtistas, strdup(artista), tArtista);
-            }
-            list_pushBack(tArtista->canciones, cancion);
+        else { 
+            free(cancion);
+            continue;
         }
+        
+        // Cuarta parte.
+        List* artistas = split_string(cancion->artist, ";");
 
-        // Guardar por tempo
+        for (char* artista = list_first(artistas); artista != NULL; artista = list_next(artistas)) {
+            tipoArtista* tempArtista = searchMap(mapaArtistas, artista);
+            if (tempArtista == NULL) {
+                
+                tempArtista = (tipoArtista*) malloc(sizeof(tipoArtista));
+                
+                strncpy(tempArtista->artist, artista, MAX_ARTIST);
+                tempArtista->artist[MAX_ARTIST - 1] = '\0';
+
+                tempArtista->canciones = list_create();
+                insertMap(mapaArtistas, strdup(artista), tempArtista);
+            }
+            list_pushBack(tempArtista->canciones, cancion);
+        }
+        list_destroy_with(artistas, free);
+
+        // Quinta parte.
         if (cancion->tempo < 80)
             list_pushBack(cancionesLentas, cancion);
         else if (cancion->tempo <= 120)
@@ -134,7 +176,7 @@ void cargar_canciones() {
         else
             list_pushBack(cancionesRapidas, cancion);
 
-        // Guardar por género
+        // Sexta parte.
         List* listaGenero = searchMap(mapaGeneros, cancion->track_genre);
         if (listaGenero == NULL) {
             listaGenero = list_create();
@@ -144,16 +186,11 @@ void cargar_canciones() {
 
         contador++;
     }
-
+    
+    // Séptima parte.
     fclose(archivo);
     puts("\nProceso completado de forma exitosa !! :D");
     printf("Se cargaron %d canciones correctamente.\n", contador);
-}
-
-int comparar_canciones(const void *a, const void *b) {
-    tipoCancion* cancionA = *(tipoCancion**)a;
-    tipoCancion* cancionB = *(tipoCancion**)b;
-    return strcmp(cancionA->track_name, cancionB->track_name);
 }
 
 void normalizar_genero(char* genero) {
@@ -412,8 +449,8 @@ void mostrar_lista() {
     else{
         printf("\nTotal: %d canción(es).\n", contador);
         if (contador < 10) { printf("Prueba añadiendo unas cuantas más!\n"); }
-        else if (contador > 20) { printf("Una playlist muy consistente!\n"); }
-        else if (contador > 50) { printf("Wow!!! Tienes muchas canciones! :D\n"); }
+        else if (contador > 50) { printf("Una playlist muy consistente!\n"); }
+        else if (contador > 20) { printf("Wow!!! Tienes muchas canciones! :D\n"); }
     }
 }
 
