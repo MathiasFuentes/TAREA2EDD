@@ -207,25 +207,6 @@ void buscar_por_genero() {
         printf("No hay canciones registradas para este género.\n");
 }
 
-void formatearTitleCase(char* str) {
-    int i = 0;
-    int capitalizar = 1;
-
-    while (str[i] != '\0') {
-        if (isspace(str[i])) {
-            capitalizar = 1;
-        } else {
-            if (capitalizar && isalpha(str[i])) {
-                str[i] = toupper(str[i]);
-                capitalizar = 0;
-            } else {
-                str[i] = tolower(str[i]);
-            }
-        }
-        i++;
-    }
-}
-
 void buscar_por_artista() {
     puts("========================================");
     puts("         Búsqueda por Artista");
@@ -233,11 +214,12 @@ void buscar_por_artista() {
     char nombreArtista[MAX_ARTIST];
     printf("\nIngrese el nombre del artista: ");
     scanf(" %[^\n]", nombreArtista);
-    formatearTitleCase(nombreArtista);
 
     tipoArtista* artista = searchMap(mapaArtistas, nombreArtista);
     if (artista == NULL) {
-        printf("No se encontraron canciones del artista '%s' :( \n", nombreArtista);
+        printf("No se encontraron canciones del artista '%s' :( \n\n", nombreArtista);
+        puts("Prueba escribiéndolo de forma capitalizada y con sus respectivas mayúsculas");
+        puts("Por ejemplo: BTS, Pablo Chill-E, Dora The Explorer, etc...");
         return;
     }
 
@@ -259,6 +241,9 @@ void buscar_por_artista() {
 
     if (cantidad == 0)
         printf("No hay canciones registradas para este artista.\n");
+    else{
+        printf("Hay %d canciones de %s registradas !", cantidad, artista->artist);
+    }
 }
 
 char leer_opcion_tempo(){
@@ -293,7 +278,6 @@ char leer_opcion_tempo(){
 
     return opcion;
 }
-
 
 void buscar_por_tempo() {
     char opcion = leer_opcion_tempo();
@@ -334,26 +318,32 @@ void buscar_por_tempo() {
 }
 
 void crear_lista_reproduccion() {
+    puts("========================================");
+    puts("         CREACIÓN DE PLAYLIST");
+    puts("========================================");
     char nombreLista[256];
-    printf("Ingrese el nombre de la nueva lista de reproducción: ");
+    printf("\nIngrese el nombre de la nueva lista de reproducción: ");
     scanf(" %[^\n]", nombreLista);
 
     if (searchMap(listasReproduccion, nombreLista) != NULL) {
-        printf("Ya existe una lista con ese nombre.\n");
+        printf("Ya existe una lista con ese nombre, intenta con otro :/\n");
         return;
     }
 
     List* nuevaLista = list_create();
     insertMap(listasReproduccion, strdup(nombreLista), nuevaLista);
 
-    printf("Lista '%s' creada exitosamente.\n", nombreLista);
+    printf("Lista '%s' creada exitosamente :D !!!\n", nombreLista);
 }
 
 void agregar_a_lista() {
+    puts("========================================");
+    puts("      AGREGAR CANCIÓN A PLAYLIST");
+    puts("========================================");
     char idCancion[MAX_ID];
     char nombreLista[256];
 
-    printf("Ingrese el ID de la canción: ");
+    printf("\nIngrese el ID de la canción: ");
     scanf(" %[^\n]", idCancion);
 
     printf("Ingrese el nombre de la lista de reproducción: ");
@@ -361,18 +351,20 @@ void agregar_a_lista() {
 
     tipoCancion* cancion = searchMap(mapaCancionesPorID, idCancion);
     if (cancion == NULL) {
-        printf("No se encontró la canción con ID '%s'.\n", idCancion);
+        printf("No se encontró la canción con ID '%s' :( \n", idCancion);
         return;
     }
 
     List* lista = searchMap(listasReproduccion, nombreLista);
     if (lista == NULL) {
-        printf("No existe una lista con el nombre '%s'.\n", nombreLista);
+        printf("No existe una lista con el nombre '%s' :( \n", nombreLista);
         return;
     }
 
     list_pushBack(lista, cancion);
-    printf("Canción agregada exitosamente a la lista '%s'.\n", nombreLista);
+    puts("\nMuy buena elección !");
+    printf("'%s' de %s\n", cancion->track_name, cancion->artist);
+    printf("Canción agregada exitosamente a la lista '%s' :D !!!\n", nombreLista);
 }
 
 void mostrar_lista() {
@@ -380,8 +372,9 @@ void mostrar_lista() {
         printf("No hay listas de reproducción creadas.\n");
         return;
     }
-
-    printf("\nListas de reproducción disponibles:\n");
+    puts("========================================");
+    puts("         PLAYLIST DISPONIBLES");
+    puts("========================================");
 
     Pair* par = firstMap(listasReproduccion);
     while (par != NULL) {
@@ -395,7 +388,7 @@ void mostrar_lista() {
 
     List* lista = searchMap(listasReproduccion, nombreLista);
     if (lista == NULL) {
-        printf("No se encontró la lista '%s'.\n", nombreLista);
+        printf("\nNo se encontró la lista '%s' :( ...\n", nombreLista);
         return;
     }
 
@@ -410,8 +403,12 @@ void mostrar_lista() {
 
     if (contador == 0)
         printf("La lista está vacía.\n");
-    else
+    else{
         printf("\nTotal: %d canción(es).\n", contador);
+        if (contador < 10) { printf("Prueba añadiendo unas cuantas más!\n"); }
+        else if (contador > 20) { printf("Una playlist muy consistente!\n"); }
+        else if (contador > 50) { printf("Wow!!! Tienes muchas canciones! :D\n"); }
+    }
 }
 
 // --- Main ---
@@ -430,10 +427,17 @@ int main() {
 
     char opcion;
     do {
+        char lectura[256];
         mostrarMenuPrincipal();
         printf("Ingrese su opción: ");
-        scanf(" %c", &opcion);
+        scanf(" %s", &lectura);
 
+        if (!isdigit(lectura[0]) || lectura[1] != '\0'){
+            while (getchar() != '\n');
+            continue;
+        }
+        opcion = lectura[0];
+        
         switch (opcion) {
         case '1':
             limpiarPantalla();
@@ -452,12 +456,15 @@ int main() {
             buscar_por_tempo();
             break;
         case '5':
+            limpiarPantalla();
             crear_lista_reproduccion();
             break;
         case '6':
+            limpiarPantalla();
             agregar_a_lista();
             break;
         case '7':
+            limpiarPantalla();
             mostrar_lista();
             break;
         }
