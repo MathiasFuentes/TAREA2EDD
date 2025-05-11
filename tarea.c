@@ -253,6 +253,7 @@ void buscar_por_genero() {
         printf("# %d\n", cantidad + 1);
         printf("Artista:    %s\n", cancion->artist);
         printf("Título:     %s\n", cancion->track_name);
+        printf("ID:         %s\n", cancion->id);
         printf("BPM:        %.2f\n\n", cancion->tempo);
 
         cancion = list_next(canciones);
